@@ -1,7 +1,108 @@
-<template>
-  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="17" fill="currentColor">
-    <path
-      d="M11 2.253a1 1 0 1 0-2 0h2zm-2 13a1 1 0 1 0 2 0H9zm.447-12.167a1 1 0 1 0 1.107-1.666L9.447 3.086zM1 2.253L.447 1.42A1 1 0 0 0 0 2.253h1zm0 13H0a1 1 0 0 0 1.553.833L1 15.253zm8.447.833a1 1 0 1 0 1.107-1.666l-1.107 1.666zm0-14.666a1 1 0 1 0 1.107 1.666L9.447 1.42zM19 2.253h1a1 1 0 0 0-.447-.833L19 2.253zm0 13l-.553.833A1 1 0 0 0 20 15.253h-1zm-9.553-.833a1 1 0 1 0 1.107 1.666L9.447 14.42zM9 2.253v13h2v-13H9zm1.553-.833C9.203.523 7.42 0 5.5 0v2c1.572 0 2.961.431 3.947 1.086l1.107-1.666zM5.5 0C3.58 0 1.797.523.447 1.42l1.107 1.666C2.539 2.431 3.928 2 5.5 2V0zM0 2.253v13h2v-13H0zm1.553 13.833C2.539 15.431 3.928 15 5.5 15v-2c-1.92 0-3.703.523-5.053 1.42l1.107 1.666zM5.5 15c1.572 0 2.961.431 3.947 1.086l1.107-1.666C9.203 13.523 7.42 13 5.5 13v2zm5.053-11.914C11.539 2.431 12.928 2 14.5 2V0c-1.92 0-3.703.523-5.053 1.42l1.107 1.666zM14.5 2c1.573 0 2.961.431 3.947 1.086l1.107-1.666C18.203.523 16.421 0 14.5 0v2zm3.5.253v13h2v-13h-2zm1.553 12.167C18.203 13.523 16.421 13 14.5 13v2c1.573 0 2.961.431 3.947 1.086l1.107-1.666zM14.5 13c-1.92 0-3.703.523-5.053 1.42l1.107 1.666C11.539 15.431 12.928 15 14.5 15v-2z"
+&lt;template>
+  &lt;svg 
+    xmlns="http://www.w3.org/2000/svg" 
+    width="24" 
+    height="24" 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    stroke-width="2" 
+    stroke-linecap="round" 
+    stroke-linejoin="round"
+  >
+    &lt;!-- 文档主体 -->
+    &lt;path 
+      d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z" 
+      class="doc-body"
     />
-  </svg>
-</template>
+    
+    &lt;!-- 文档折角 -->
+    &lt;path 
+      d="M14 2v6h6" 
+      class="doc-fold"
+    />
+    
+    &lt;!-- 文档内容线条 -->
+    &lt;path 
+      d="M8 13h8M8 17h8M8 9h2" 
+      class="doc-lines"
+    />
+
+    &lt;!-- 信息图标 -->
+    &lt;g class="info-icon">
+      &lt;circle cx="18" cy="19" r="3" />
+      &lt;path d="M17.8 18h.4v2h-.4z" />
+      &lt;circle cx="18" cy="16.8" r=".2" />
+    &lt;/g>
+  &lt;/svg>
+&lt;/template>
+
+&lt;script setup lang="ts">
+// 这是一个纯展示组件，不需要任何脚本逻辑
+&lt;/script>
+
+&lt;style scoped>
+.doc-body {
+  stroke: currentColor;
+  stroke-width: 1.5;
+  fill: none;
+}
+
+.doc-fold {
+  stroke: currentColor;
+  stroke-width: 1.5;
+  fill: none;
+}
+
+.doc-lines {
+  stroke: currentColor;
+  stroke-width: 1.5;
+}
+
+.info-icon {
+  stroke: currentColor;
+  fill: none;
+  
+  circle {
+    stroke-width: 1.5;
+  }
+  
+  path {
+    stroke-width: 2;
+    fill: currentColor;
+  }
+}
+
+/* 悬停动画效果 */
+svg:hover {
+  .doc-body {
+    stroke-width: 2;
+    transition: stroke-width 0.2s ease;
+  }
+  
+  .info-icon {
+    transform: scale(1.1);
+    transform-origin: center;
+    transition: transform 0.2s ease;
+    
+    circle {
+      fill: currentColor;
+      opacity: 0.1;
+      transition: all 0.2s ease;
+    }
+  }
+  
+  .doc-lines {
+    stroke-width: 2;
+    stroke-dasharray: 12;
+    stroke-dashoffset: 24;
+    animation: dash 1s linear infinite;
+  }
+}
+
+@keyframes dash {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+&lt;/style>
