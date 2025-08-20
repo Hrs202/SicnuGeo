@@ -150,11 +150,27 @@
 
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
-import { ElMessage } from 'element-plus'
+import 'element-plus/dist/index.css'
+import type { UploadFile, UploadFiles } from 'element-plus'
 import CesiumViewer from '@/components/gis/CesiumViewer.vue'
-import * as Cesium from 'cesium'
+import { ElMessage } from 'element-plus'
+import { Cartesian3, Math as CesiumMath } from 'cesium'
+import 'cesium/Build/Cesium/Widgets/widgets.css'
 
-const formRef = ref()
+interface FormInstance {
+  validate: (callback: (valid: boolean) => void) => void
+  resetFields: () => void
+}
+
+interface Attachment {
+  name: string
+  url: string
+  type: 'image' | 'video'
+  size: number
+  uploadTime: string
+}
+
+const formRef = ref<FormInstance>()
 const mapRef = ref()
 const viewer = ref()
 const loading = ref(false)
@@ -198,7 +214,7 @@ const rules = {
 const history = ref<any[]>([])
 
 // 地图点击选择位置
-const onMapClick = async (e: any) => {
+const onMapClick = async (e: { position: { x: number; y: number } }) => {
   if (!viewer.value) return
   
   // 获取点击位置的笛卡尔坐标
@@ -206,9 +222,9 @@ const onMapClick = async (e: any) => {
   if (!position) return
 
   // 转换为经纬度坐标
-  const cartographic = Cesium.Cartographic.fromCartesian(position)
-  const lng = Cesium.Math.toDegrees(cartographic.longitude)
-  const lat = Cesium.Math.toDegrees(cartographic.latitude)
+  const cartographic = CesiumMath.toRadians(position)
+  const lng = CesiumMath.toDegrees(cartographic.longitude)
+  const lat = CesiumMath.toDegrees(cartographic.latitude)
   
   try {
     // 获取地理编码信息
@@ -240,7 +256,7 @@ const getAddressFromCoordinates = async (lng: number, lat: number) => {
 }
 
 // 更新地图标记
-const updateMarker = (position: Cesium.Cartesian3) => {
+const updateMarker = (position: Cartesian3) => {
   if (!viewer.value) return
   
   // 移除旧标记
@@ -253,14 +269,14 @@ const updateMarker = (position: Cesium.Cartesian3) => {
     position: position,
     billboard: {
       image: '/images/marker.png',
-      verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+      verticalOrigin: 1, // BOTTOM
       scale: 0.5
     }
   })
   
   // 定位到标记点
   viewer.value.camera.flyTo({
-    destination: Cesium.Cartesian3.fromDegrees(
+    destination: Cartesian3.fromDegrees(
       form.location.lng,
       form.location.lat,
       1000
@@ -290,13 +306,17 @@ const beforeUpload = (file: File) => {
 }
 
 // 附件上传成功
-const handleUploadSuccess = (res: any, file: any, fileList: any) => {
+const handleUploadSuccess = (
+  res: { code: number; message?: string; url?: string },
+  file: UploadFile,
+  fileList: UploadFiles
+) => {
   if (res.code === 0) {
-    form.attachments = fileList.map((f: any) => ({
+    form.attachments = fileList.map(f => ({
       name: f.name,
-      url: f.response?.url || f.url,
-      type: f.raw.type.startsWith('image/') ? 'image' : 'video',
-      size: f.size,
+      url: f.response?.url || f.url || '',
+      type: f.raw?.type.startsWith('image/') ? 'image' : 'video',
+      size: f.size || 0,
       uploadTime: new Date().toISOString()
     }))
     ElMessage.success('文件上传成功')
@@ -402,7 +422,7 @@ const locateOnMap = (location: { lng: number; lat: number }) => {
   if (!viewer.value) return
   
   viewer.value.camera.flyTo({
-    destination: Cesium.Cartesian3.fromDegrees(
+    destination: Cartesian3.fromDegrees(
       location.lng,
       location.lat,
       1000
@@ -507,11 +527,11 @@ const formatCategory = (row: any) => {
 
 :deep(.el-upload-list__item) {
   transition: all 0.3s;
-  
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
-  }
+}
+
+:deep(.el-upload-list__item:hover) {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
 }
 
 .location-info {
